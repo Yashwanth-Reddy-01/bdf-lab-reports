@@ -6,9 +6,7 @@
 
 ## Live link
 
-**URL:** YOUR-DEPLOYED-URL (e.g. Render / Railway / NxtWave Cloud IDE)
-
-*If the project cannot be deployed, replace this with the reason and add Postman screenshots of every endpoint.*
+**URL:** https://bdf-lab-reports.onrender.com/
 
 ## Objective
 
@@ -73,21 +71,25 @@ After `npm install express`, Express is found in `node_modules/express`.
 
 ## Viva questions
 
-**1. What is the difference between `package.json` and `node_modules`?**
+**1. What is the difference between `package.json` and `node_modules`?**  
 `package.json` is the project's description: metadata, scripts and the list of dependencies with version ranges. `node_modules` is the folder where the actual downloaded packages are stored. It can always be rebuilt from `package.json` with `npm install`, which is why it is not committed to Git.
 
-**2. What does `app.listen` do?**
+**2. What does `app.listen` do?**  
 It starts the HTTP server, binds it to a port (3000 here) and begins accepting incoming requests. The optional callback runs once the server is ready.
 
-**3. What do request and response represent?**
-`req` represents the incoming HTTP request from the client (method, URL, headers, body). `res` is the outgoing response we build: status code, headers and body, sent back with `res.send`, `res.json` or `res.end`.
+**3. What do request and response represent?**  
+request contains information about the incoming HTTP request. response is used to send data and status codes back to the client.
 
-## Notes: problems faced and how I solved them
+## Problems Faced and Solutions
 
+- **npm install failed with "Could not read package.json" (ENOENT):** The terminal was open in the outer lab-01 folder created while extracting the zip, and the project was inside a second lab-01 folder. I moved into the inner folder with `cd lab-01` and ran `npm install` again.
+- **Deployment root folder:** On Render, the project sits inside the `lab-01` folder of the repository, so I set the Root Directory to `lab-01` so Render could find `package.json`.
 - **Unknown routes returned Express's default message:** I added a catch-all `app.use(...)` that returns 404, and placed it *after* all other routes because Express matches in the order routes are defined.
 - **Port already in use (`EADDRINUSE`):** running both servers at once clashes on port 3000. I stop one first, or set a different `PORT`.
 
-## Repository notes
+## Git and Repository Notes
 
-- `.gitignore` excludes `node_modules/` and `.env`.
-- Screenshots are in `screenshots/`.
+- The `.gitignore` file excludes `node_modules/` and `.env`.
+- The `node_modules/` directory must not be committed.
+- Screenshots are stored in the `screenshots/` directory.
+- The project is submitted through the course GitHub repository.
