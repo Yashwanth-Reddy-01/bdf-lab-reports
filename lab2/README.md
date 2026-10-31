@@ -10,6 +10,16 @@
 
 **Deployment URL:** https://bdf-lab-reports-2.onrender.com
 
+**Live Endpoints:**
+
+| Method | Live URL |
+|--------|----------|
+| GET | https://bdf-lab-reports-2.onrender.com/books/ |
+| GET | https://bdf-lab-reports-2.onrender.com/books/1/ |
+| POST | https://bdf-lab-reports-2.onrender.com/books/ |
+| PUT | https://bdf-lab-reports-2.onrender.com/books/1/ |
+| DELETE | https://bdf-lab-reports-2.onrender.com/books/1/ |
+
 *(If the project cannot be deployed, replace this line with the reason and rely on the Postman screenshots below.)*
 
 ## Objective
