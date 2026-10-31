@@ -1,7 +1,7 @@
 # Lab 2: SQLite database and CRUD routes
 
-- **Name:** G.S.RITWIK
-- **Registration Number:** 252U1R9036
+- **Name:** K.YASHWANTH REDDY
+- **Registration Number:** 252U1R9073
 - **Section:** CSE-GEN-AI-2A-304
 - **Course:** Backend Development Fundamentals
 - **Lab Number:** 02
