@@ -11,13 +11,13 @@
 
 | Lab No. | Topic | Folder / Report | Status |
 | :---: | :--- | :---: | :---: |
-| **Lab 01** | Node.js and Express Server (Endpoints, Status Codes, Viva) | [📂 lab-01](./lab-01) | ✅ Completed |
+| **Lab 01** | Node.js and Express Server (Endpoints, Status Codes, Viva) | [📂 lab-01](https://github.com/Yashwanth-Reddy-01/bdf-lab-reports/tree/main/lab-01) · [📄 View Report](./lab-01/README.md) | ✅ Completed |
 
 ---
 
 ## 📁 Repository Structure
 
-`
+`	ext
 bdf-lab-reports/
 ├── README.md                 # Main course lab index & student details
 ├── .gitignore                # Global gitignore (node_modules, .env, etc.)
