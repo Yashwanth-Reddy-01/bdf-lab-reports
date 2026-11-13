@@ -1,0 +1,16 @@
+{
+  "name": "sports-shed-lg5",
+  "version": "1.0.0",
+  "description": "LG-5 SportsShed sports equipment issue management system",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "screenshots": "node generate_screenshots.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "puppeteer-core": "^25.17.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  }
+}
