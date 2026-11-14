@@ -32,7 +32,8 @@ npm install
 npm start
 ```
 
-Server: `http://localhost:3000`
+- Local Server: `http://localhost:3000`
+- **Live Demo (Render):** [https://bdf-lab-reports-3.onrender.com/](https://bdf-lab-reports-3.onrender.com/)
 
 ## API endpoints
 
