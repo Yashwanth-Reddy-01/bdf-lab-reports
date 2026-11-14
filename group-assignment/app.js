@@ -67,9 +67,16 @@ app.get('/players/:id/', async (request, response) => {
 
 app.post('/players/', async (request, response) => {
   const {playerName} = request.body
+
+  // Validation: player name is required
+  if (typeof playerName !== 'string' || playerName.trim() === '') {
+    response.status(400).send('Player name is required')
+    return
+  }
+
   const result = await db.run(
     'INSERT INTO players (player_name) VALUES (?)',
-    [playerName],
+    [playerName.trim()],
   )
   response.status(201).send({
     playerId: result.lastID,
@@ -77,10 +84,21 @@ app.post('/players/', async (request, response) => {
   })
 })
 
-// ---------------- KITS (CRUD ENDPOINTS) ----------------
+// ---------------- KITS (CRUD & SEARCH BY SPORT) ----------------
 
 app.get('/kits/', async (request, response) => {
-  const kits = await db.all('SELECT * FROM kits ORDER BY kit_id')
+  const {sport} = request.query
+  let query = 'SELECT * FROM kits'
+  const params = []
+
+  // Search by query parameter: case-insensitive match, empty list when no match
+  if (sport !== undefined) {
+    query += ' WHERE LOWER(sport) = LOWER(?)'
+    params.push(sport)
+  }
+
+  query += ' ORDER BY kit_id'
+  const kits = await db.all(query, params)
   response.send(kits)
 })
 
@@ -99,9 +117,21 @@ app.get('/kits/:id/', async (request, response) => {
 
 app.post('/kits/', async (request, response) => {
   const {kitName, sport} = request.body
+
+  // Validation: kit name and sport are required
+  if (
+    typeof kitName !== 'string' ||
+    kitName.trim() === '' ||
+    typeof sport !== 'string' ||
+    sport.trim() === ''
+  ) {
+    response.status(400).send('Kit name and sport are required')
+    return
+  }
+
   const result = await db.run(
     'INSERT INTO kits (kit_name, sport) VALUES (?, ?)',
-    [kitName, sport],
+    [kitName.trim(), sport.trim()],
   )
   response.status(201).send({
     kitId: result.lastID,
@@ -112,6 +142,18 @@ app.post('/kits/', async (request, response) => {
 app.put('/kits/:id/', async (request, response) => {
   const {id} = request.params
   const {kitName, sport} = request.body
+
+  // Validation: kit name and sport are required
+  if (
+    typeof kitName !== 'string' ||
+    kitName.trim() === '' ||
+    typeof sport !== 'string' ||
+    sport.trim() === ''
+  ) {
+    response.status(400).send('Kit name and sport are required')
+    return
+  }
+
   const kit = await db.get(
     'SELECT * FROM kits WHERE kit_id = ?',
     [id],
@@ -123,7 +165,7 @@ app.put('/kits/:id/', async (request, response) => {
 
   await db.run(
     'UPDATE kits SET kit_name = ?, sport = ? WHERE kit_id = ?',
-    [kitName, sport, id],
+    [kitName.trim(), sport.trim(), id],
   )
   response.send('Kit Updated Successfully')
 })
@@ -170,6 +212,17 @@ app.get('/loans/', async (request, response) => {
 
 app.post('/loans/', async (request, response) => {
   const {playerId, kitId} = request.body
+
+  // Validation: check for valid IDs
+  if (
+    playerId === undefined ||
+    kitId === undefined ||
+    !Number.isInteger(Number(playerId)) ||
+    !Number.isInteger(Number(kitId))
+  ) {
+    response.status(400).send('Valid Player ID and Kit ID are required')
+    return
+  }
 
   const player = await db.get(
     'SELECT * FROM players WHERE player_id = ?',
