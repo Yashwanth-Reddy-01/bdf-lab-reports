@@ -52,6 +52,41 @@ app.get('/players/', async (request, response) => {
   response.send(players)
 })
 
+// LG-5 Twist: Player returned loan history (Test 3)
+app.get('/players/:id/history', async (request, response) => {
+  const {id} = request.params
+
+  const player = await db.get(
+    'SELECT * FROM players WHERE player_id = ?',
+    [id],
+  )
+
+  if (!player) {
+    response.status(404).send('Player Not Found')
+    return
+  }
+
+  const history = await db.all(
+    `SELECT
+       loans.loan_id,
+       loans.player_id,
+       players.player_name,
+       loans.kit_id,
+       kits.kit_name,
+       kits.sport,
+       loans.issue_date,
+       loans.return_date
+     FROM loans
+     INNER JOIN players ON loans.player_id = players.player_id
+     INNER JOIN kits ON loans.kit_id = kits.kit_id
+     WHERE loans.player_id = ? AND loans.return_date IS NOT NULL
+     ORDER BY loans.loan_id DESC`,
+    [id],
+  )
+
+  response.send(history)
+})
+
 app.get('/players/:id/', async (request, response) => {
   const {id} = request.params
   const player = await db.get(
@@ -250,6 +285,34 @@ app.post('/loans/', async (request, response) => {
     loanId: result.lastID,
     message: 'Loan Added Successfully',
   })
+})
+
+// ---------------- YOUR TWIST: RETURN FLOW (LG-5) ----------------
+
+// Twist Test 1 & 2: Return a loan once (200), second attempt gets 409 "Already returned"
+app.post('/loans/:id/return', async (request, response) => {
+  const {id} = request.params
+  const loan = await db.get(
+    'SELECT * FROM loans WHERE loan_id = ?',
+    [id],
+  )
+
+  if (!loan) {
+    response.status(404).send('Loan Not Found')
+    return
+  }
+
+  if (loan.return_date !== null) {
+    response.status(409).send('Already returned')
+    return
+  }
+
+  await db.run(
+    "UPDATE loans SET return_date = DATE('now') WHERE loan_id = ?",
+    [id],
+  )
+
+  response.status(200).send('Loan Returned Successfully')
 })
 
 // Centralized error handling middleware
