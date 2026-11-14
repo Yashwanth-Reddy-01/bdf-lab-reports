@@ -77,15 +77,126 @@ app.post('/players/', async (request, response) => {
   })
 })
 
-// Route layout for kits and loans
+// ---------------- KITS (CRUD ENDPOINTS) ----------------
+
 app.get('/kits/', async (request, response) => {
   const kits = await db.all('SELECT * FROM kits ORDER BY kit_id')
   response.send(kits)
 })
 
+app.get('/kits/:id/', async (request, response) => {
+  const {id} = request.params
+  const kit = await db.get(
+    'SELECT * FROM kits WHERE kit_id = ?',
+    [id],
+  )
+  if (!kit) {
+    response.status(404).send('Kit Not Found')
+  } else {
+    response.send(kit)
+  }
+})
+
+app.post('/kits/', async (request, response) => {
+  const {kitName, sport} = request.body
+  const result = await db.run(
+    'INSERT INTO kits (kit_name, sport) VALUES (?, ?)',
+    [kitName, sport],
+  )
+  response.status(201).send({
+    kitId: result.lastID,
+    message: 'Kit Added Successfully',
+  })
+})
+
+app.put('/kits/:id/', async (request, response) => {
+  const {id} = request.params
+  const {kitName, sport} = request.body
+  const kit = await db.get(
+    'SELECT * FROM kits WHERE kit_id = ?',
+    [id],
+  )
+  if (!kit) {
+    response.status(404).send('Kit Not Found')
+    return
+  }
+
+  await db.run(
+    'UPDATE kits SET kit_name = ?, sport = ? WHERE kit_id = ?',
+    [kitName, sport, id],
+  )
+  response.send('Kit Updated Successfully')
+})
+
+app.delete('/kits/:id/', async (request, response) => {
+  const {id} = request.params
+  const kit = await db.get(
+    'SELECT * FROM kits WHERE kit_id = ?',
+    [id],
+  )
+  if (!kit) {
+    response.status(404).send('Kit Not Found')
+    return
+  }
+
+  try {
+    await db.run('DELETE FROM kits WHERE kit_id = ?', [id])
+    response.send('Kit Deleted Successfully')
+  } catch (error) {
+    response.status(409).send('Kit has existing loan records')
+  }
+})
+
+// ---------------- LOANS (ISSUE & JOIN ENDPOINTS) ----------------
+
 app.get('/loans/', async (request, response) => {
-  const loans = await db.all('SELECT * FROM loans ORDER BY loan_id')
+  const loans = await db.all(`
+    SELECT
+      loans.loan_id,
+      loans.player_id,
+      players.player_name,
+      loans.kit_id,
+      kits.kit_name,
+      kits.sport,
+      loans.issue_date,
+      loans.return_date
+    FROM loans
+    INNER JOIN players ON loans.player_id = players.player_id
+    INNER JOIN kits ON loans.kit_id = kits.kit_id
+    ORDER BY loans.loan_id
+  `)
   response.send(loans)
+})
+
+app.post('/loans/', async (request, response) => {
+  const {playerId, kitId} = request.body
+
+  const player = await db.get(
+    'SELECT * FROM players WHERE player_id = ?',
+    [playerId],
+  )
+  if (!player) {
+    response.status(404).send('Player Not Found')
+    return
+  }
+
+  const kit = await db.get(
+    'SELECT * FROM kits WHERE kit_id = ?',
+    [kitId],
+  )
+  if (!kit) {
+    response.status(404).send('Kit Not Found')
+    return
+  }
+
+  const result = await db.run(
+    'INSERT INTO loans (player_id, kit_id) VALUES (?, ?)',
+    [playerId, kitId],
+  )
+  response.status(201).send({
+    loanId: result.lastID,
+    message: 'Loan Added Successfully',
+  })
 })
 
 // Centralized error handling middleware
